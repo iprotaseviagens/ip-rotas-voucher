@@ -533,7 +533,7 @@
         <div class="form-section-title">Dados do contrato</div>
         <div class="field"><label>Código da Viagem</label><input id="f-codigo" placeholder="IP-2024-001" oninput="renderVoucher()"></div>
         <div class="field"><label>Número do Contrato</label><input id="f-contrato" placeholder="IP-0000000001" oninput="renderVoucher()"></div>
-        <div class="field"><label>Roteiro</label><input id="f-roteiro" placeholder="MACEIÓ • NATAL • FORTALEZA" oninput="renderVoucher()"></div>
+        <div class="field"><label>Destino</label><input id="f-roteiro" placeholder="Maceió, Alagoas" oninput="renderVoucher()"></div>
         <div class="field"><label>Data de Emissão</label><input id="f-emissao" type="date" oninput="renderVoucher()"></div>
       </div>
 
@@ -547,7 +547,7 @@
       <!-- Aéreo -->
       <div class="form-section" id="sec-aereo">
         <div class="form-section-title">✈️ Aéreo</div>
-        <div class="field"><label>Chegada no Aeroporto / Check-in</label><input id="f-aereo-apres" placeholder="MACEIÓ - BALCÃO: GOL - 10/09/2024 ÀS 06:00" oninput="renderVoucher()"></div>
+        <div class="field"><label>Chegada no Aeroporto</label><input id="f-aereo-apres" placeholder="Ex: 90 min antes — Balcão GOL" oninput="renderVoucher()"></div>
         <div class="field"><label>Tarifa</label><input id="f-aereo-tarifa" placeholder="Tarifa não reembolsável" oninput="renderVoucher()"></div>
         <div id="voosList" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;"></div>
         <button class="add-btn" onclick="addVoo()">+ Adicionar voo</button>
@@ -617,9 +617,12 @@
       <!-- Info Adicional -->
       <div class="form-section">
         <div class="form-section-title">ℹ️ Informações Adicionais</div>
-        <div class="field">
-          <textarea id="f-info" rows="5" placeholder="Deixe em branco para usar o texto padrão." oninput="renderVoucher()"></textarea>
+        <div class="notice info" style="margin-bottom:4px">
+          <span>💡</span>
+          <span>Adicione apenas os tópicos relevantes para este cliente. A API sugere automaticamente ao importar.</span>
         </div>
+        <div class="services-list" id="infoList"></div>
+        <button class="add-btn" onclick="addInfo()">+ Adicionar tópico</button>
       </div>
 
     </div>
@@ -710,6 +713,10 @@ window.onload = () => {
   // data hoje
   document.getElementById('f-emissao').value = new Date().toISOString().slice(0,10);
   addPax(); addVoo(); addServico();
+  // Tópicos padrão de informações adicionais
+  addInfo('É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque.');
+  addInfo('Os horários de partida e de chegada são previstos e estão sujeitos a alterações.');
+  addInfo('Dúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: (31) 9 7216-5602');
   renderVoucher();
 };
 
@@ -896,6 +903,27 @@ function addIngresso(data={}) {
 // ════════════════════════════════════════════════════════════
 //  SERVIÇOS
 // ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+//  INFORMAÇÕES ADICIONAIS (tópicos)
+// ════════════════════════════════════════════════════════════
+let infoCount = 0;
+
+function addInfo(val='') {
+  infoCount++;
+  const id = infoCount;
+  const div = document.createElement('div');
+  div.className = 'service-item'; div.id = 'info-'+id;
+  div.innerHTML = `
+    <textarea id="info-txt-${id}" placeholder="Ex: Documentação obrigatória no embarque…" oninput="renderVoucher()">${val}</textarea>
+    <button class="remove-btn" onclick="document.getElementById('info-${id}').remove();renderVoucher()">✕</button>`;
+  document.getElementById('infoList').appendChild(div);
+  renderVoucher();
+}
+
+function getInfoTopicos() {
+  return [...document.querySelectorAll('[id^="info-txt-"]')].map(el => el.value.trim()).filter(Boolean);
+}
+
 function addServico(val='') {
   servicosCount++;
   const id = servicosCount;
@@ -981,7 +1009,7 @@ Formato JSON exato:
   "passeios":  { "ativo": false, "items": [{"nome":"","data":"","obs":""}] },
   "seguro":    { "ativo": false, "seguradora":"","plano":"","cobertura":"","apolice":"","inicio":"","fim":"" },
   "servicosInclusos": [],
-  "infoAdicional": ""
+  "infoTopicos": []
 }
 
 Regras:
@@ -990,7 +1018,13 @@ Regras:
 - "ativo": true apenas se a seção existe no voucher
 - "servicosInclusos" = array de strings descrevendo cada serviço incluso
 - "locCia" = localizador da companhia aérea
-- "infoAdicional" deixe vazio`;
+- "infoTopicos" = array de tópicos de informações adicionais RELEVANTES para este cliente específico.
+  Inclua SEMPRE: documentação obrigatória no embarque, horários sujeitos a alterações, contato da agência.
+  Inclua SOMENTE SE HOUVER menores de idade: regras de embarque de menores.
+  Inclua SOMENTE SE HOUVER voo internacional: documentação para viagens internacionais.
+  Inclua SOMENTE SE HOUVER seguro: como acionar o seguro viagem.
+  NÃO inclua tópicos irrelevantes para o perfil dos passageiros deste voucher.
+  Cada tópico deve ser uma string clara e objetiva.`;
 
     msgContent.push({ type: 'text', text: promptText });
 
@@ -1092,6 +1126,16 @@ function preencherFormulario(d) {
   document.getElementById('servicesList').innerHTML = ''; servicosCount = 0;
   (d.servicosInclusos || []).forEach(s => addServico(s));
   if (!d.servicosInclusos?.length) addServico();
+
+  // Info Adicional — tópicos gerados pela API
+  document.getElementById('infoList').innerHTML = ''; infoCount = 0;
+  if (d.infoTopicos && d.infoTopicos.length) {
+    d.infoTopicos.forEach(t => addInfo(t));
+  } else {
+    addInfo('É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque.');
+    addInfo('Os horários de partida e de chegada são previstos e estão sujeitos a alterações.');
+    addInfo('Dúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: (31) 9 7216-5602');
+  }
 
   renderVoucher();
 }
@@ -1224,12 +1268,15 @@ function renderVoucher() {
   const servicos = getServicos();
   const svcHTML  = servicos.map(s => `<li>${s}</li>`).join('');
 
-  // Info Adicional
-  const infoCustom = document.getElementById('f-info').value.trim();
-  const infoPadrao = `É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque. Os horários de partida e de chegada são previstos e estão sujeitos a alterações.\n\nPara crianças (menor de 16 anos de idade): deve estar acompanhada do pai ou da mãe, ou do responsável legal, com autorização por escrito e firma reconhecida.\n\nDúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: ${contato}`;
-  const infoFinal  = (infoCustom || infoPadrao).split('\n').map(l => l ? `<p style="margin-bottom:5px">${l}</p>` : '<br>').join('');
+  // Info Adicional — lista de tópicos
+  const infoTopicos = getInfoTopicos();
+  const infoFinal = infoTopicos.length
+    ? infoTopicos.map(t => `<p style="margin-bottom:6px;padding-left:14px;text-indent:-14px">• ${t}</p>`).join('')
+    : `<p style="margin-bottom:6px;padding-left:14px;text-indent:-14px">• É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque.</p>
+       <p style="margin-bottom:6px;padding-left:14px;text-indent:-14px">• Os horários de partida e de chegada são previstos e estão sujeitos a alterações.</p>
+       <p style="margin-bottom:6px;padding-left:14px;text-indent:-14px">• Dúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: ${contato}</p>`;
 
-  // Chegada no Aeroporto
+  // Apresentação aéreo
   const apres  = document.getElementById('f-aereo-apres').value;
   const tarifa = document.getElementById('f-aereo-tarifa').value;
 
@@ -1256,7 +1303,7 @@ function renderVoucher() {
     <div class="v-meta">
       <div class="v-meta-row"><div class="v-meta-label">CÓDIGO DA VIAGEM</div><div class="v-meta-value">${codigo}</div></div>
       <div class="v-meta-row"><div class="v-meta-label">NÚMERO DO CONTRATO</div><div class="v-meta-value">${contrato}</div></div>
-      <div class="v-meta-row"><div class="v-meta-label">ROTEIRO</div><div class="v-meta-value">${roteiro}</div></div>
+      <div class="v-meta-row"><div class="v-meta-label">DESTINO</div><div class="v-meta-value">${roteiro}</div></div>
       <div class="v-meta-row"><div class="v-meta-label">VENDEDOR</div><div class="v-meta-value">${vendedor}</div></div>
       <div class="v-meta-row"><div class="v-meta-label">DATA DE EMISSÃO</div><div class="v-meta-value">${emissao}</div></div>
     </div>
@@ -1345,12 +1392,13 @@ function renderVoucher() {
     </div>` : ''}
 
     <!-- INFORMAÇÕES ADICIONAIS -->
+    ${infoFinal ? `
     <div class="v-section">
       <div class="v-section-header"><span>ℹ️ Informações Adicionais</span></div>
       <div class="v-section-body">
-        <div class="v-info-box">${infoFinal}</div>
+        <div style="font-size:9pt;color:#2B2B2B;line-height:1.7">${infoFinal}</div>
       </div>
-    </div>
+    </div>` : ''}
 
     ${modulos.protocolo ? `
     <!-- PROTOCOLO -->
@@ -1446,11 +1494,16 @@ function limparTudo() {
   document.getElementById('transferList').innerHTML= ''; transferCount = 0;
   document.getElementById('passeiosList').innerHTML= ''; passeiosCount = 0;
   document.getElementById('servicesList').innerHTML= ''; servicosCount = 0;
+  document.getElementById('infoList').innerHTML     = ''; infoCount     = 0;
   document.getElementById('pasteText').value = '';
   document.getElementById('f-info').value    = '';
   uploadedFile = null; uploadedB64 = null;
   document.getElementById('fileName').style.display = 'none';
   addPax(); addVoo(); addServico();
+  // Tópicos padrão de informações adicionais
+  addInfo('É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque.');
+  addInfo('Os horários de partida e de chegada são previstos e estão sujeitos a alterações.');
+  addInfo('Dúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: (31) 9 7216-5602');
   renderVoucher();
 }
 </script>
