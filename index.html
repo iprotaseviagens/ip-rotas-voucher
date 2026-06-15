@@ -222,8 +222,14 @@
   .preview-toolbar .toolbar-right { display: flex; gap: 8px; align-items: center; }
 
   .preview-scroll {
-    flex: 1; overflow-y: auto; padding: 24px;
+    flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px 16px;
     display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+
+  /* ── VOUCHER WRAPPER para zoom ───────────────────────── */
+  .voucher-wrapper {
+    width: 794px;
+    transform-origin: top center;
   }
 
   /* ── VOUCHER (IMPRESSÃO) ─────────────────────────────── */
@@ -240,16 +246,34 @@
 
   /* cabeçalho */
   .v-header {
-    padding: 20px 28px 16px;
+    padding: 22px 28px 18px;
     border-bottom: 3px solid #C9A84C;
-    display: flex; align-items: center; gap: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
   }
-  .v-logo { height: 64px; object-fit: contain; }
-  .v-header-text h1 {
-    font-size: 22pt; font-weight: 700; color: #1B2A4A; line-height: 1;
+  .v-header-left { flex: 1; display: flex; align-items: center; }
+  .v-logo { height: 72px; object-fit: contain; }
+
+  .v-header-center {
+    flex: 2; text-align: center;
   }
-  .v-header-text p {
-    font-size: 10pt; color: #C9A84C; margin-top: 2px; font-weight: 500;
+  .v-header-center h1 {
+    font-size: 28pt; font-weight: 700; color: #1B2A4A;
+    line-height: 1; letter-spacing: -0.5px;
+  }
+  .v-header-center p {
+    font-size: 10.5pt; color: #C9A84C; margin-top: 4px;
+    font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+  }
+
+  .v-header-right {
+    flex: 1; display: flex; justify-content: flex-end; align-items: center;
+  }
+  .v-header-badge {
+    font-size: 8pt; font-weight: 700; color: #1B2A4A;
+    background: #F5EDD6; border: 1px solid #C9A84C;
+    padding: 4px 10px; border-radius: 99px;
+    letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
   }
 
   /* dados contrato */
@@ -359,6 +383,7 @@
     .workspace { display: block; height: auto; }
     .preview-panel { background: white; }
     .preview-scroll { padding: 0; }
+    .voucher-wrapper { transform: none !important; margin: 0 !important; width: 100% !important; }
     .voucher-page {
       width: 100%; box-shadow: none; border-radius: 0;
       page-break-after: always;
@@ -631,6 +656,12 @@
       <h3>Pré-visualização</h3>
       <div class="toolbar-right">
         <span class="tag" id="previewTag">Preencha os dados</span>
+        <div style="display:flex;align-items:center;gap:4px;background:var(--off);border:1px solid var(--border);border-radius:var(--radius);padding:2px 6px">
+          <button class="btn btn-sm" style="background:none;border:none;padding:2px 6px;font-size:14px;cursor:pointer;color:var(--navy)" onclick="changeZoom(-0.1)" title="Diminuir">−</button>
+          <span id="zoomLabel" style="font-size:11px;font-weight:600;color:var(--navy);min-width:36px;text-align:center">Auto</span>
+          <button class="btn btn-sm" style="background:none;border:none;padding:2px 6px;font-size:14px;cursor:pointer;color:var(--navy)" onclick="changeZoom(0.1)" title="Aumentar">+</button>
+          <button class="btn btn-sm" style="background:none;border:none;padding:2px 6px;font-size:11px;cursor:pointer;color:var(--muted)" onclick="resetZoom()" title="Ajustar à tela">⊡</button>
+        </div>
         <button class="btn btn-outline btn-sm" onclick="renderVoucher()">↻ Atualizar</button>
         <button class="btn btn-primary" onclick="window.print()">⬇ Salvar PDF</button>
       </div>
@@ -1211,10 +1242,15 @@ function renderVoucher() {
 
     <!-- CABEÇALHO -->
     <div class="v-header">
-      <img class="v-logo" src="${logoSrc}" alt="IP Rotas e Viagens">
-      <div class="v-header-text">
+      <div class="v-header-left">
+        <img class="v-logo" src="${logoSrc}" alt="IP Rotas e Viagens">
+      </div>
+      <div class="v-header-center">
         <h1>Voucher</h1>
         <p>Documentação de Viagem</p>
+      </div>
+      <div class="v-header-right">
+        <span class="v-header-badge">IP Rotas e Viagens</span>
       </div>
     </div>
 
@@ -1338,8 +1374,9 @@ function renderVoucher() {
 
   </div>`;
 
-  document.getElementById('previewScroll').innerHTML = html;
+  document.getElementById('previewScroll').innerHTML = `<div class="voucher-wrapper" id="voucherWrapper">${html}</div>`;
   document.getElementById('previewTag').textContent = roteiro !== '—' ? roteiro : 'Pré-visualização';
+  applyZoom();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1362,6 +1399,46 @@ function toggleApiKey() {
   const inp = document.getElementById('apiKey');
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
+
+// ════════════════════════════════════════════════════════════
+//  ZOOM
+// ════════════════════════════════════════════════════════════
+let currentZoom = null; // null = auto
+
+function applyZoom() {
+  const wrapper = document.getElementById('voucherWrapper');
+  if (!wrapper) return;
+  const scroll  = document.getElementById('previewScroll');
+  const available = scroll.clientWidth - 32; // padding
+  const natural   = 794;
+
+  let scale;
+  if (currentZoom === null) {
+    scale = Math.min(1, available / natural);
+  } else {
+    scale = currentZoom;
+  }
+
+  wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.marginBottom = `${(wrapper.offsetHeight * scale) - wrapper.offsetHeight}px`;
+  document.getElementById('zoomLabel').textContent = currentZoom === null ? 'Auto' : Math.round(scale * 100) + '%';
+}
+
+function changeZoom(delta) {
+  const scroll    = document.getElementById('previewScroll');
+  const available = scroll.clientWidth - 32;
+  const autoScale = Math.min(1, available / 794);
+  if (currentZoom === null) currentZoom = autoScale;
+  currentZoom = Math.max(0.3, Math.min(1.5, currentZoom + delta));
+  applyZoom();
+}
+
+function resetZoom() {
+  currentZoom = null;
+  applyZoom();
+}
+
+window.addEventListener('resize', applyZoom);
 
 function limparTudo() {
   if (!confirm('Limpar todos os dados do formulário?')) return;
