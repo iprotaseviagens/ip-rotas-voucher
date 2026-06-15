@@ -441,7 +441,7 @@
 
       <div class="notice info">
         <span>ℹ️</span>
-        <span>Cole o texto do voucher da operadora, ou envie o arquivo PDF/imagem. O Claude (Anthropic) extrai os dados automaticamente.</span>
+        <span>Cole o texto do voucher da operadora, ou envie o arquivo PDF/imagem. O Claude extrai os dados automaticamente via servidor seguro.</span>
       </div>
 
       <!-- Upload -->
@@ -602,20 +602,15 @@
     <!-- TAB: CONFIG -->
     <div class="tab-content" id="tab-config">
       <div class="form-section">
-        <div class="form-section-title">Chave de API — Anthropic</div>
+        <div class="form-section-title">API Anthropic</div>
         <div class="notice info">
+          <span>✅</span>
+          <span>A chave de API fica configurada no <strong>servidor Vercel</strong> — segura e invisível. Nenhuma configuração necessária aqui.</span>
+        </div>
+        <div class="notice warn">
           <span>🔑</span>
-          <span>Obtida em <strong>console.anthropic.com/settings/keys</strong>. Fica salva só no seu navegador.</span>
+          <span>Para atualizar a chave: acesse o dashboard do Vercel → Settings → Environment Variables → <strong>ANTHROPIC_API_KEY</strong></span>
         </div>
-        <div class="field">
-          <label>Anthropic API Key</label>
-          <div id="apiKeyWrap" style="position:relative">
-            <input type="password" id="apiKey" placeholder="sk-ant-api03-…" style="width:100%;padding-right:36px">
-            <button id="apiKeyToggle" onclick="toggleApiKey()">👁</button>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="salvarConfig()">Salvar configuração</button>
-        <div id="configStatus" style="font-size:12px;color:var(--success);display:none">✓ Salvo!</div>
       </div>
       <div class="form-section">
         <div class="form-section-title">Dados padrão da agência</div>
@@ -907,11 +902,7 @@ function processFile(file) {
 //  EXTRAÇÃO VIA CLAUDE API
 // ════════════════════════════════════════════════════════════
 async function extrairDados() {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey) {
-    alert('Configure sua chave Anthropic na aba ⚙️ Config primeiro.\n\nconsole.anthropic.com/settings/keys');
-    switchTab('config'); return;
-  }
+  // Chave gerenciada pelo servidor Vercel — não necessária no browser
 
   const texto = document.getElementById('pasteText').value.trim();
   if (!texto && !uploadedB64) {
@@ -974,13 +965,9 @@ Regras:
 
     setStatus('loading', 'Interpretando dados com IA…');
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('/api/claude', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 2000,
