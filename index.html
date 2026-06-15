@@ -547,7 +547,7 @@
       <!-- Aéreo -->
       <div class="form-section" id="sec-aereo">
         <div class="form-section-title">✈️ Aéreo</div>
-        <div class="field"><label>Apresentação / Check-in</label><input id="f-aereo-apres" placeholder="MACEIÓ - BALCÃO: GOL - 10/09/2024 ÀS 06:00" oninput="renderVoucher()"></div>
+        <div class="field"><label>Chegada no Aeroporto / Check-in</label><input id="f-aereo-apres" placeholder="MACEIÓ - BALCÃO: GOL - 10/09/2024 ÀS 06:00" oninput="renderVoucher()"></div>
         <div class="field"><label>Tarifa</label><input id="f-aereo-tarifa" placeholder="Tarifa não reembolsável" oninput="renderVoucher()"></div>
         <div id="voosList" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;"></div>
         <button class="add-btn" onclick="addVoo()">+ Adicionar voo</button>
@@ -1229,7 +1229,7 @@ function renderVoucher() {
   const infoPadrao = `É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque. Os horários de partida e de chegada são previstos e estão sujeitos a alterações.\n\nPara crianças (menor de 16 anos de idade): deve estar acompanhada do pai ou da mãe, ou do responsável legal, com autorização por escrito e firma reconhecida.\n\nDúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: ${contato}`;
   const infoFinal  = (infoCustom || infoPadrao).split('\n').map(l => l ? `<p style="margin-bottom:5px">${l}</p>` : '<br>').join('');
 
-  // Apresentação aéreo
+  // Chegada no Aeroporto
   const apres  = document.getElementById('f-aereo-apres').value;
   const tarifa = document.getElementById('f-aereo-tarifa').value;
 
