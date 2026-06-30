@@ -858,6 +858,16 @@ window.onload = () => {
   addOrient({ titulo: '📄 Documentação obrigatória', texto: 'RG ou CNH originais de todos os passageiros. Menores devem apresentar certidão de nascimento.' });
   addOrient({ titulo: '🎒 Na bagagem de mão', texto: 'Documentos originais, cartão do plano de saúde, remédios de uso contínuo, itens de valor e carregador.' });
   renderAll();
+
+  // Auto-render: qualquer alteração no formulário regenera voucher + cartilha
+  const sidebar = document.querySelector('.sidebar');
+  let renderTimer = null;
+  const scheduleRender = () => {
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(renderAll, 200);
+  };
+  sidebar.addEventListener('input',  scheduleRender);
+  sidebar.addEventListener('change', scheduleRender);
 };
 
 // ════════════════════════════════════════════════════════════
