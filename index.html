@@ -377,9 +377,92 @@
   .empty-preview p  { font-size: 13px; }
 
   /* ── PRINT ───────────────────────────────────────────── */
+  /* ── ABAS PREVIEW ───────────────────────────────────── */
+  .preview-tabs {
+    display: flex; border-bottom: 2px solid var(--border);
+    background: var(--white); padding: 0 20px;
+  }
+  .preview-tab {
+    padding: 10px 18px; font-size: 12px; font-weight: 600;
+    color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: all .15s; letter-spacing: .3px;
+  }
+  .preview-tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+  .preview-tab:hover:not(.active) { color: var(--navy); }
+
+  /* ── CARTILHA ────────────────────────────────────────── */
+  .cartilha-page {
+    width: 794px;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0,0,0,.12);
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #2B2B2B;
+    position: relative;
+  }
+  .cartilha-faixa-top {
+    height: 8px; background: #C9A84C; width: 100%;
+  }
+  .cartilha-faixa-bot {
+    height: 5px; background: #C9A84C; width: 100%;
+  }
+  .cartilha-body { padding: 28px 36px 20px; }
+  .cartilha-logo-wrap { text-align: center; margin-bottom: 16px; }
+  .cartilha-logo { height: 70px; object-fit: contain; }
+
+  .cartilha-abertura { text-align: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #E8D9A8; }
+  .cartilha-abertura h1 { font-size: 22pt; font-weight: 700; color: #1B2A4A; margin-bottom: 6px; }
+  .cartilha-abertura p  { font-size: 11pt; color: #555; }
+
+  .cartilha-label {
+    font-size: 8pt; font-weight: 700; color: #C9A84C;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .cartilha-section { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #EBEBEB; }
+  .cartilha-section:last-of-type { border-bottom: none; }
+
+  /* voos lado a lado */
+  .cartilha-voos { display: flex; gap: 0; }
+  .cartilha-voo {
+    flex: 1; padding-right: 20px;
+  }
+  .cartilha-voo + .cartilha-voo {
+    padding-right: 0; padding-left: 20px;
+    border-left: 1px solid #E2E6EC;
+  }
+  .cartilha-voo-label { font-size: 8.5pt; font-weight: 700; color: #C9A84C; margin-bottom: 4px; }
+  .cartilha-voo-num   { font-size: 15pt; font-weight: 700; color: #1B2A4A; margin-bottom: 2px; }
+  .cartilha-voo-rota  { font-size: 9pt; color: #555; margin-bottom: 2px; }
+  .cartilha-voo-loc   { font-size: 8.5pt; color: #888; }
+
+  /* hospedagem */
+  .cartilha-hotel-nome { font-size: 14pt; font-weight: 700; color: #1B2A4A; margin-bottom: 4px; }
+  .cartilha-hotel-info { font-size: 9pt; color: #555; line-height: 1.6; }
+  .cartilha-hotel-info strong { color: #1B2A4A; }
+
+  /* orientações */
+  .cartilha-orient-item { display: flex; gap: 12px; margin-bottom: 12px; }
+  .cartilha-orient-icon { font-size: 14pt; flex-shrink: 0; margin-top: 1px; }
+  .cartilha-orient-body {}
+  .cartilha-orient-title { font-size: 9.5pt; font-weight: 700; color: #1B2A4A; margin-bottom: 2px; }
+  .cartilha-orient-text  { font-size: 9pt; color: #555; line-height: 1.5; }
+  .cartilha-orient-text strong { color: #1B2A4A; }
+
+  /* encerramento */
+  .cartilha-encerra { text-align: center; padding-top: 8px; }
+  .cartilha-encerra h2 { font-size: 16pt; font-weight: 700; color: #1B2A4A; margin-bottom: 6px; }
+  .cartilha-encerra p  { font-size: 9.5pt; color: #555; margin-bottom: 4px; line-height: 1.6; }
+  .cartilha-encerra .assinatura { font-size: 10pt; font-weight: 700; color: #C9A84C; margin-top: 8px; }
+
+  .cartilha-rodape {
+    text-align: center; font-size: 7.5pt; color: #888;
+    padding: 8px 0 10px; letter-spacing: .5px;
+  }
+
   @media print {
     body { background: white; }
-    .topbar, .workspace > .sidebar, .preview-toolbar { display: none !important; }
+    .topbar, .workspace > .sidebar, .preview-toolbar, .preview-tabs { display: none !important; }
     .workspace { display: block; height: auto; }
     .preview-panel { background: white; }
     .preview-scroll { padding: 0; }
@@ -388,6 +471,9 @@
       width: 100%; box-shadow: none; border-radius: 0;
       page-break-after: always;
     }
+    .cartilha-page { width: 100%; box-shadow: none; border-radius: 0; }
+    /* Imprime só a aba ativa */
+    .preview-content { display: block !important; }
   }
 
   /* ── MISC ────────────────────────────────────────────── */
@@ -607,6 +693,17 @@
         <div class="field"><label>Cabine</label><input id="f-cru-cab" oninput="renderVoucher()"></div>
       </div>
 
+      <!-- Cartilha -->
+      <div class="form-section">
+        <div class="form-section-title">✉️ Cartilha — Orientações</div>
+        <div class="notice info" style="margin-bottom:6px">
+          <span>💡</span>
+          <span>Filtradas automaticamente ao importar. Edite ou adicione livremente.</span>
+        </div>
+        <div id="orientList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <button class="add-btn" onclick="addOrient()">+ Adicionar orientação</button>
+      </div>
+
       <!-- Serviços Inclusos -->
       <div class="form-section">
         <div class="form-section-title">✅ Serviços Inclusos</div>
@@ -665,15 +762,33 @@
           <button class="btn btn-sm" style="background:none;border:none;padding:2px 6px;font-size:14px;cursor:pointer;color:var(--navy)" onclick="changeZoom(0.1)" title="Aumentar">+</button>
           <button class="btn btn-sm" style="background:none;border:none;padding:2px 6px;font-size:11px;cursor:pointer;color:var(--muted)" onclick="resetZoom()" title="Ajustar à tela">⊡</button>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="renderVoucher()">↻ Atualizar</button>
+        <button class="btn btn-outline btn-sm" onclick="renderAll()">↻ Atualizar</button>
         <button class="btn btn-primary" onclick="window.print()">⬇ Salvar PDF</button>
       </div>
     </div>
+
+    <!-- Abas Voucher / Cartilha -->
+    <div class="preview-tabs">
+      <div class="preview-tab active" id="ptab-voucher" onclick="switchPreviewTab('voucher')">📄 Voucher</div>
+      <div class="preview-tab" id="ptab-cartilha" onclick="switchPreviewTab('cartilha')">✉️ Cartilha</div>
+    </div>
+
     <div class="preview-scroll" id="previewScroll">
-      <div class="empty-preview">
-        <div class="icon">📄</div>
-        <h3>Seu voucher aparece aqui</h3>
-        <p>Preencha os dados ou importe um voucher da operadora.</p>
+      <!-- Voucher -->
+      <div id="preview-voucher" class="preview-content">
+        <div class="empty-preview">
+          <div class="icon">📄</div>
+          <h3>Seu voucher aparece aqui</h3>
+          <p>Preencha os dados ou importe um voucher da operadora.</p>
+        </div>
+      </div>
+      <!-- Cartilha -->
+      <div id="preview-cartilha" class="preview-content" style="display:none">
+        <div class="empty-preview">
+          <div class="icon">✉️</div>
+          <h3>Cartilha de boas-vindas</h3>
+          <p>Gerada automaticamente após preencher os dados.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -717,7 +832,11 @@ window.onload = () => {
   addInfo('É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque.');
   addInfo('Os horários de partida e de chegada são previstos e estão sujeitos a alterações.');
   addInfo('Dúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: (31) 9 7216-5602');
-  renderVoucher();
+  // Orientações padrão da cartilha
+  addOrient({ titulo: '⏰ Chegada ao aeroporto', texto: 'Recomendamos chegar com 2h30 de antecedência para voos domésticos.' });
+  addOrient({ titulo: '📄 Documentação obrigatória', texto: 'RG ou CNH originais de todos os passageiros. Menores devem apresentar certidão de nascimento.' });
+  addOrient({ titulo: '🎒 Na bagagem de mão', texto: 'Documentos originais, cartão do plano de saúde, remédios de uso contínuo, itens de valor e carregador.' });
+  renderAll();
 };
 
 // ════════════════════════════════════════════════════════════
@@ -1009,22 +1128,27 @@ Formato JSON exato:
   "passeios":  { "ativo": false, "items": [{"nome":"","data":"","obs":""}] },
   "seguro":    { "ativo": false, "seguradora":"","plano":"","cobertura":"","apolice":"","inicio":"","fim":"" },
   "servicosInclusos": [],
-  "infoTopicos": []
+  "infoTopicos": [],
+  "orientacoes": []
 }
 
 Regras:
 - datas no formato dd/mm/aaaa
-- campo ausente no voucher = string vazia ""
-- "ativo": true apenas se a seção existe no voucher
-- "servicosInclusos" = array de strings descrevendo cada serviço incluso
-- "locCia" = localizador da companhia aérea
-- "infoTopicos" = array de tópicos de informações adicionais RELEVANTES para este cliente específico.
-  Inclua SEMPRE: documentação obrigatória no embarque, horários sujeitos a alterações, contato da agência.
-  Inclua SOMENTE SE HOUVER menores de idade: regras de embarque de menores.
-  Inclua SOMENTE SE HOUVER voo internacional: documentação para viagens internacionais.
-  Inclua SOMENTE SE HOUVER seguro: como acionar o seguro viagem.
-  NÃO inclua tópicos irrelevantes para o perfil dos passageiros deste voucher.
-  Cada tópico deve ser uma string clara e objetiva.`;
+- campo ausente = string vazia ""
+- "ativo": true apenas se a secao existe no voucher
+- "servicosInclusos" = array de strings descrevendo cada servico incluso
+- "locCia" = localizador da companhia aerea
+- "infoTopicos" = topicos relevantes para o voucher tecnico
+- "orientacoes" = array de objetos {"titulo":"emoji + titulo","texto":"corpo"} para a cartilha.
+  Analise o perfil dos passageiros e inclua APENAS orientacoes relevantes:
+  SEMPRE: chegada ao aeroporto (calcule 2h30 antes da partida), documentacao obrigatoria, bagagem de mao.
+  SE crianca < 2 anos: embarque prioritario, bebe conforto como bagagem especial.
+  SE crianca 2-17 anos: certidao de nascimento obrigatoria, autorizacao notarial se so um responsavel.
+  SE voo internacional: documentacao internacional e visto.
+  SE hotel: dica de chegada baseada no horario de pouso vs check-in.
+  SE seguro: como acionar.
+  Tom amigavel e direto. Titulo com emoji, texto 2-3 linhas.`;
+
 
     msgContent.push({ type: 'text', text: promptText });
 
@@ -1420,7 +1544,7 @@ function renderVoucher() {
 
   </div>`;
 
-  document.getElementById('previewScroll').innerHTML = `<div class="voucher-wrapper" id="voucherWrapper">${html}</div>`;
+  document.getElementById('preview-voucher').innerHTML = `<div class="voucher-wrapper" id="voucherWrapper">${html}</div>`;
   document.getElementById('previewTag').textContent = roteiro !== '—' ? roteiro : 'Pré-visualização';
   applyZoom();
 }
@@ -1438,7 +1562,17 @@ function salvarConfig() {
   const st = document.getElementById('configStatus');
   st.style.display = 'block';
   setTimeout(() => st.style.display = 'none', 2000);
-  renderVoucher();
+  // Orientações da cartilha geradas pela API
+  document.getElementById('orientList').innerHTML = ''; orientCount = 0;
+  if (d.orientacoes && d.orientacoes.length) {
+    d.orientacoes.forEach(o => addOrient(o));
+  } else {
+    addOrient({ titulo: '⏰ Chegada ao aeroporto', texto: 'Recomendamos chegar com 2h30 de antecedência para voos domésticos.' });
+    addOrient({ titulo: '📄 Documentação obrigatória', texto: 'RG ou CNH originais de todos os passageiros.' });
+    addOrient({ titulo: '🎒 Na bagagem de mão', texto: 'Documentos originais, cartão do plano de saúde, remédios de uso contínuo e carregador.' });
+  }
+
+  renderAll();
 }
 
 function toggleApiKey() {
@@ -1495,6 +1629,7 @@ function limparTudo() {
   document.getElementById('passeiosList').innerHTML= ''; passeiosCount = 0;
   document.getElementById('servicesList').innerHTML= ''; servicosCount = 0;
   document.getElementById('infoList').innerHTML     = ''; infoCount     = 0;
+  document.getElementById('orientList').innerHTML   = ''; orientCount   = 0;
   document.getElementById('pasteText').value = '';
   document.getElementById('f-info').value    = '';
   uploadedFile = null; uploadedB64 = null;
@@ -1504,8 +1639,210 @@ function limparTudo() {
   addInfo('É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque.');
   addInfo('Os horários de partida e de chegada são previstos e estão sujeitos a alterações.');
   addInfo('Dúvidas: entre em contato com seu consultor IP Rotas e Viagens. Contato 24h: (31) 9 7216-5602');
-  renderVoucher();
+  // Orientações padrão da cartilha
+  addOrient({ titulo: '⏰ Chegada ao aeroporto', texto: 'Recomendamos chegar com 2h30 de antecedência para voos domésticos.' });
+  addOrient({ titulo: '📄 Documentação obrigatória', texto: 'RG ou CNH originais de todos os passageiros. Menores devem apresentar certidão de nascimento.' });
+  addOrient({ titulo: '🎒 Na bagagem de mão', texto: 'Documentos originais, cartão do plano de saúde, remédios de uso contínuo, itens de valor e carregador.' });
+  renderAll();
 }
+
+// ════════════════════════════════════════════════════════════
+//  ABAS PREVIEW
+// ════════════════════════════════════════════════════════════
+let activePreviewTab = 'voucher';
+
+function switchPreviewTab(tab) {
+  activePreviewTab = tab;
+  document.getElementById('preview-voucher').style.display  = tab === 'voucher'  ? '' : 'none';
+  document.getElementById('preview-cartilha').style.display = tab === 'cartilha' ? '' : 'none';
+  document.getElementById('ptab-voucher').classList.toggle('active',  tab === 'voucher');
+  document.getElementById('ptab-cartilha').classList.toggle('active', tab === 'cartilha');
+  applyZoom();
+}
+
+// ════════════════════════════════════════════════════════════
+//  ORIENTAÇÕES DA CARTILHA
+// ════════════════════════════════════════════════════════════
+let orientCount = 0;
+
+function addOrient(data={}) {
+  orientCount++;
+  const id = orientCount;
+  const div = document.createElement('div');
+  div.className = 'pax-card'; div.id = 'orient-'+id;
+  div.innerHTML = `
+    <div class="pax-title">Orientação ${id}</div>
+    <button class="remove-btn" onclick="document.getElementById('orient-${id}').remove();renderCartilha()">✕</button>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      <div class="field">
+        <label>Ícone + Título</label>
+        <input id="orient-titulo-${id}" placeholder="⏰ Chegada ao aeroporto" value="${data.titulo||''}" oninput="renderCartilha()">
+      </div>
+      <div class="field">
+        <label>Texto</label>
+        <textarea id="orient-texto-${id}" rows="3" oninput="renderCartilha()">${data.texto||''}</textarea>
+      </div>
+    </div>`;
+  document.getElementById('orientList').appendChild(div);
+  renderCartilha();
+}
+
+function getOrientacoes() {
+  return [...document.querySelectorAll('[id^="orient-titulo-"]')].map(el => {
+    const id = el.id.replace('orient-titulo-','');
+    return {
+      titulo: el.value.trim(),
+      texto:  (document.getElementById('orient-texto-'+id)?.value || '').trim()
+    };
+  }).filter(o => o.titulo);
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER CARTILHA
+// ════════════════════════════════════════════════════════════
+function renderCartilha() {
+  const logoSrc   = document.querySelector('.v-logo')?.src || '';
+  const nomes     = getPaxIds().map(id => document.getElementById('pax-nome-'+id)?.value || '').filter(Boolean);
+  const nomesStr  = nomes.join(', ') || 'Passageiros';
+  const destino   = document.getElementById('f-roteiro').value || '—';
+  const vendedor  = document.getElementById('cfg-vendedor').value || 'IP Rotas e Viagens';
+  const contato   = document.getElementById('cfg-contato').value  || '(31) 9 0000-0000';
+
+  // Voos
+  const vooIds  = getVooIds();
+  const voosData = vooIds.map(id => ({
+    de:      document.getElementById('voo-de-'+id)?.value   || '',
+    para:    document.getElementById('voo-para-'+id)?.value || '',
+    cia:     document.getElementById('voo-cia-'+id)?.value  || '',
+    num:     document.getElementById('voo-num-'+id)?.value  || '',
+    data:    document.getElementById('voo-data-'+id)?.value || '',
+    partida: document.getElementById('voo-part-'+id)?.value || '',
+    chegada: document.getElementById('voo-cheg-'+id)?.value || '',
+    loc:     document.getElementById('voo-loc-'+id)?.value  || '',
+  }));
+
+  // Monta HTML dos voos — até 2 lado a lado
+  const voo1 = voosData[0];
+  const voo2 = voosData.length > 1 ? voosData[voosData.length-1] : null;
+
+  function vooCard(v, label) {
+    if (!v || !v.num) return '';
+    return `
+      <div class="cartilha-voo">
+        <div class="cartilha-voo-label">✈ ${label}${v.data ? ' — ' + v.data : ''}</div>
+        <div class="cartilha-voo-num">${v.num} · ${v.partida} → ${v.chegada}</div>
+        <div class="cartilha-voo-rota">${v.de} → ${v.para}</div>
+        ${v.loc ? `<div class="cartilha-voo-loc">Localizador: ${v.loc}</div>` : ''}
+      </div>`;
+  }
+
+  const voosHTML = (voo1 || voo2) ? `
+    <div class="cartilha-section">
+      <div class="cartilha-label">Seus Voos</div>
+      <div class="cartilha-voos">
+        ${vooCard(voo1, 'IDA')}
+        ${voo2 ? vooCard(voo2, 'VOLTA') : ''}
+      </div>
+    </div>` : '';
+
+  // Hospedagem
+  const hospIds = getHospIds();
+  let hospHTML = '';
+  if (modulos.hospedagem && hospIds.length) {
+    const h = hospIds[0];
+    const nome   = document.getElementById('h-nome-'+h)?.value  || '';
+    const end    = document.getElementById('h-end-'+h)?.value   || '';
+    const tel    = document.getElementById('h-tel-'+h)?.value   || '';
+    const acomo  = document.getElementById('h-acomo-'+h)?.value || '';
+    const cin    = document.getElementById('h-in-'+h)?.value    || '';
+    const cout   = document.getElementById('h-out-'+h)?.value   || '';
+    const obs    = document.getElementById('h-obs-'+h)?.value   || '';
+    const hlocal = document.getElementById('pax-loc-1')?.value  || '';
+
+    if (nome) hospHTML = `
+      <div class="cartilha-section">
+        <div class="cartilha-label">Sua Hospedagem</div>
+        <div class="cartilha-hotel-nome">${nome}</div>
+        <div class="cartilha-hotel-info">
+          ${end ? end + (tel ? ' · ' + tel : '') + '<br>' : ''}
+          ${cin  ? `Check-in: <strong>${cin}</strong>` : ''}${cin && cout ? ' · ' : ''}${cout ? `Check-out: <strong>${cout}</strong><br>` : ''}
+          ${acomo || ''}${obs ? ' · ' + obs : ''}
+        </div>
+      </div>`;
+  }
+
+  // Orientações
+  const orientacoes = getOrientacoes();
+  const orientHTML = orientacoes.length ? `
+    <div class="cartilha-section">
+      <div class="cartilha-label">Orientações Importantes</div>
+      ${orientacoes.map(o => `
+        <div class="cartilha-orient-item">
+          <div class="cartilha-orient-body">
+            <div class="cartilha-orient-title">${o.titulo}</div>
+            <div class="cartilha-orient-text">${o.texto.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</div>
+          </div>
+        </div>`).join('')}
+    </div>` : '';
+
+  const cartilhaHTML = `
+  <div class="cartilha-page">
+    <div class="cartilha-faixa-top"></div>
+    <div class="cartilha-body">
+      <div class="cartilha-logo-wrap">
+        <img class="cartilha-logo" src="${logoSrc}" alt="IP Rotas e Viagens">
+      </div>
+      <div class="cartilha-abertura">
+        <h1>✅ Check-in realizado com sucesso!</h1>
+        <p>Tudo confirmado, <strong>${nomesStr}</strong> — agora é só aproveitar!</p>
+      </div>
+      ${voosHTML}
+      ${hospHTML}
+      ${orientHTML}
+      <div class="cartilha-encerra">
+        <h2>✈ Boa viagem!</h2>
+        <p>Que ${destino !== '—' ? destino : 'essa viagem'} seja repleta de memórias incríveis.</p>
+        <div class="assinatura">Com carinho, ${vendedor}</div>
+      </div>
+    </div>
+    <div class="cartilha-rodape">${vendedor} · Contagem, MG · Viagens com Curadoria e Propósito</div>
+    <div class="cartilha-faixa-bot"></div>
+  </div>`;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'voucher-wrapper';
+  wrapper.id = 'cartilhaWrapper';
+  wrapper.innerHTML = cartilhaHTML;
+  document.getElementById('preview-cartilha').innerHTML = '';
+  document.getElementById('preview-cartilha').appendChild(wrapper);
+  applyZoom();
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER ALL (voucher + cartilha)
+// ════════════════════════════════════════════════════════════
+function renderAll() {
+  renderVoucher();
+  renderCartilha();
+}
+
+// Override applyZoom para suportar ambos os wrappers
+const _origApplyZoom = applyZoom;
+applyZoom = function() {
+  const scroll    = document.getElementById('previewScroll');
+  const available = scroll.clientWidth - 32;
+  const natural   = 794;
+  let scale = currentZoom === null ? Math.min(1, available / natural) : currentZoom;
+
+  ['voucherWrapper','cartilhaWrapper'].forEach(wid => {
+    const w = document.getElementById(wid);
+    if (!w) return;
+    w.style.transform    = `scale(${scale})`;
+    w.style.marginBottom = `${(w.offsetHeight * scale) - w.offsetHeight}px`;
+  });
+  document.getElementById('zoomLabel').textContent = currentZoom === null ? 'Auto' : Math.round(scale * 100) + '%';
+};
+
 </script>
 
 </body>
