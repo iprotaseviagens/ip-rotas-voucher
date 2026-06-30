@@ -449,6 +449,28 @@
   .cartilha-orient-text  { font-size: 9pt; color: #555; line-height: 1.5; }
   .cartilha-orient-text strong { color: #1B2A4A; }
 
+  /* destino grid */
+  .cartilha-destino-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 18px; margin-top: 6px;
+  }
+  .cartilha-destino-item { font-size: 9pt; color: #555; line-height: 1.45; }
+  .cartilha-destino-item strong { display: block; font-size: 8.5pt; color: #C9A84C; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; font-weight: 700; }
+  .cartilha-destino-dicas { grid-column: 1 / -1; padding-top: 8px; border-top: 1px dashed #E8D9A8; font-size: 9pt; color: #555; line-height: 1.5; margin-top: 4px; }
+
+  /* hotel como chegar */
+  .cartilha-hotel-block { font-size: 9pt; color: #555; line-height: 1.6; }
+  .cartilha-hotel-block .row { margin-bottom: 4px; }
+  .cartilha-hotel-block strong { color: #1B2A4A; }
+
+  /* emergências */
+  .cartilha-emerg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 6px; }
+  .cartilha-emerg-item {
+    background: #FBF9F3; border-left: 3px solid #C9A84C; padding: 8px 10px; border-radius: 4px;
+  }
+  .cartilha-emerg-tipo { font-size: 9pt; font-weight: 700; color: #1B2A4A; margin-bottom: 2px; }
+  .cartilha-emerg-tel  { font-size: 10pt; font-weight: 700; color: #C9A84C; margin-bottom: 2px; letter-spacing: 0.3px; }
+  .cartilha-emerg-obs  { font-size: 8.5pt; color: #777; line-height: 1.4; }
+
   /* encerramento */
   .cartilha-encerra { text-align: center; padding-top: 8px; }
   .cartilha-encerra h2 { font-size: 16pt; font-weight: 700; color: #1B2A4A; margin-bottom: 6px; }
@@ -814,6 +836,7 @@ const modulos = {
 };
 
 let uploadedFiles = []; // [{ name, mime, b64 }]
+let cartilhaExtras = null; // { destinoResumo, hotelComoChegar, emergencias }
 
 // ── Init
 window.onload = () => {
@@ -1127,7 +1150,7 @@ Analise o voucher e extraia TODOS os dados disponíveis, retornando APENAS um JS
 
 ${texto ? 'TEXTO DO VOUCHER:\n' + texto : (uploadedFiles.length > 1 ? '(veja os ' + uploadedFiles.length + ' arquivos em anexo — combine os dados de todos)' : '(veja o arquivo em anexo)')}
 
-Formato JSON exato:
+Formato JSON exato (os campos da cartilha — orientacoes e cartilhaExtras — sao OBRIGATORIOS e nao podem voltar vazios):
 {
   "codigoViagem": "",
   "numeroContrato": "",
@@ -1148,8 +1171,42 @@ Formato JSON exato:
   "seguro":    { "ativo": false, "seguradora":"","plano":"","cobertura":"","apolice":"","inicio":"","fim":"" },
   "servicosInclusos": [],
   "infoTopicos": [],
-  "orientacoes": []
+  "orientacoes": [
+    {"titulo":"⏰ Chegada ao aeroporto","texto":"Apresente-se no aeroporto X com Yh de antecedencia do voo das HH:MM."},
+    {"titulo":"📄 Documentacao","texto":"Passaporte com 6 meses de validade (vencimento apos DD/MM/AAAA)."}
+  ],
+  "cartilhaExtras": {
+    "destinoResumo": {
+      "destino": "Porto, Portugal",
+      "clima": "Outono no Porto: 12-18°C, chuvas frequentes. Leve casaco impermeavel, calcado confortavel a prova d'agua e camadas leves.",
+      "moeda": "Euro (EUR). 1 EUR ~ R$ 6,00 (consulte a cotacao do dia). Cartao internacional aceito amplamente; leve EUR em especie para extras e taxis.",
+      "tomada": "Padrao Type F (mesma da Alemanha) — leve adaptador universal. Voltagem 230V.",
+      "fuso": "+4h em relacao a Brasilia (horario de verao europeu). Quando for 12h no Brasil, sera 16h em Portugal.",
+      "idioma": "Portugues europeu (algumas diferencas de vocabulario; ingles falado em hoteis e centros turisticos).",
+      "agua": "Agua da torneira potavel em Portugal.",
+      "dicas": "Cidade caminhavel, mas com muitas ladeiras. Metro do Porto eficiente; cartao Andante recarregavel. Ribeira, Livraria Lello, Vinhos do Porto sao pontos obrigatorios."
+    },
+    "hotelComoChegar": {
+      "hotel": "Hotel Infante Sagres",
+      "endereco": "Praca D. Filipa de Lencastre, Porto",
+      "telefone": "+351 22 339 8500",
+      "distanciaAeroporto": "12 km do Aeroporto Francisco Sa Carneiro (OPO)",
+      "tempoEstimado": "20-30 min de carro",
+      "comoChegar": "Transfer privativo contratado (ver secao Transfer) com placa de identificacao na area de desembarque. Alternativas: Metro Linha E direto do aeroporto ate Trindade (~30 min), ou Uber/taxi (~25 EUR).",
+      "checkIn": "A partir das 15h. Late check-in disponivel — informar previamente.",
+      "checkOut": "Ate as 12h. Solicitar late check-out se necessario.",
+      "observacao": "Hotel cobra resort fee de X EUR/dia (a confirmar no balcao)."
+    },
+    "emergencias": [
+      {"tipo":"🇧🇷 Consulado-Geral do Brasil no Porto","telefone":"+351 22 605 5630","endereco":"Av. da Boavista 1681, Porto","observacao":"Plantao de emergencia para brasileiros em apuros."},
+      {"tipo":"🚓 Emergencia Geral (Europa)","telefone":"112","observacao":"Policia, ambulancia, bombeiros — funciona em todos os paises da UE."},
+      {"tipo":"🛡️ Seguro Viagem (acionar 24h)","telefone":"a confirmar na apolice","observacao":"Tenha o numero da apolice em maos. Chame ANTES de procurar atendimento medico para garantir cobertura."},
+      {"tipo":"📞 Suporte 24h IP Rotas e Viagens","telefone":"(31) 9 7216-5602","observacao":"Imprevistos em viagem, remarcacao, duvidas — fale conosco a qualquer hora."}
+    ]
+  }
 }
+
+ATENCAO: o exemplo acima e ilustrativo. SUBSTITUA os valores pelos dados REAIS desta viagem (destino, hotel, telefones, clima do periodo, etc.). NUNCA devolva os campos vazios.
 
 Regras:
 - datas no formato dd/mm/aaaa
@@ -1158,8 +1215,14 @@ Regras:
 - "servicosInclusos" = array de strings descrevendo cada servico incluso
 - "locCia" = localizador da companhia aerea
 - "infoTopicos" = topicos relevantes para o voucher tecnico
+- "cartilhaExtras" = OBRIGATORIO. Bloco de contexto da viagem para a cartilha de boas-vindas, com 3 subcampos:
+  * "destinoResumo": { destino, clima (do periodo da viagem, em °C, com dica de roupa), moeda (com sigla, cotacao aproximada, dica de cartao/dinheiro), tomada (padrao Type X + voltagem + recomendacao de adaptador), fuso (diferenca em horas para o horario de Brasilia), idioma, agua (potavel ou nao), dicas (2-3 frases praticas sobre o destino). Para viagens DOMESTICAS dentro do Brasil, ainda assim preencha (clima local, dica de aplicativo de transporte, costumes regionais, agua, etc). Para INTERNACIONAIS, seja minucioso.
+  * "hotelComoChegar": { hotel, endereco, telefone, distanciaAeroporto, tempoEstimado, comoChegar (citando o transfer se contratado + 2 alternativas reais), checkIn, checkOut, observacao }. Se nao houver hospedagem na viagem, retorne objeto vazio {}.
+  * "emergencias": array com no MINIMO 3 contatos relevantes (ex.: consulado brasileiro local se internacional, emergencia geral do pais, seguro viagem se contratado, suporte IP Rotas 24h). Cada item: { tipo (com emoji), telefone, endereco?, observacao }.
+  NUNCA devolva cartilhaExtras como null ou com strings vazias. Se faltar dado, INFIRA do destino (telefones de consulado e emergencia sao publicos).
 - "orientacoes" = array de objetos {"titulo":"emoji + titulo","texto":"corpo"} para a cartilha de boas-vindas.
-  Faca uma CURADORIA RICA E COMPLETA. Gere de 12 a 20 orientacoes contextuais, cobrindo TUDO que for relevante
+  OBRIGATORIO retornar PELO MENOS 12 itens. Idealmente 15-20. Nunca retorne array vazio ou com menos de 12.
+  Faca uma CURADORIA RICA E COMPLETA. Cobrindo TUDO que for relevante
   ao perfil dos passageiros, ao destino, e a cada servico contratado. Nao seja avarento — e melhor sobrar
   do que faltar. Cada orientacao deve ser pratica, acionavel e especifica para esta viagem (use nomes de
   cidades, horarios reais, companhia aerea, hotel, etc. extraidos do voucher).
@@ -1233,7 +1296,7 @@ Regras:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
+        max_tokens: 12000,
         messages: [{ role: 'user', content: msgContent }]
       })
     });
@@ -1649,6 +1712,9 @@ function salvarConfig() {
     addOrient({ titulo: '🎒 Na bagagem de mão', texto: 'Documentos originais, cartão do plano de saúde, remédios de uso contínuo e carregador.' });
   }
 
+  // Extras da cartilha (destino, hotel, emergências)
+  cartilhaExtras = d.cartilhaExtras || null;
+
   renderAll();
 }
 
@@ -1710,6 +1776,7 @@ function limparTudo() {
   document.getElementById('pasteText').value = '';
   document.getElementById('f-info').value    = '';
   uploadedFiles = [];
+  cartilhaExtras = null;
   document.getElementById('fileName').style.display = 'none';
   document.getElementById('fileName').innerHTML = '';
   document.getElementById('fileInput').value = '';
@@ -1850,6 +1917,54 @@ function renderCartilha() {
       </div>`;
   }
 
+  // Hotel — Como chegar
+  const hcc = cartilhaExtras?.hotelComoChegar;
+  const hccHTML = (hcc && hcc.hotel) ? `
+    <div class="cartilha-section">
+      <div class="cartilha-label">Como chegar ao hotel</div>
+      <div class="cartilha-hotel-block">
+        ${hcc.hotel ? `<div class="row"><strong>${hcc.hotel}</strong></div>` : ''}
+        ${hcc.endereco ? `<div class="row">📍 ${hcc.endereco}${hcc.telefone ? ' · ☎ ' + hcc.telefone : ''}</div>` : ''}
+        ${hcc.distanciaAeroporto ? `<div class="row">✈ <strong>Do aeroporto:</strong> ${hcc.distanciaAeroporto}${hcc.tempoEstimado ? ' (' + hcc.tempoEstimado + ')' : ''}</div>` : ''}
+        ${hcc.comoChegar ? `<div class="row">🚗 ${hcc.comoChegar}</div>` : ''}
+        ${(hcc.checkIn || hcc.checkOut) ? `<div class="row">🕒 ${hcc.checkIn ? '<strong>Check-in:</strong> ' + hcc.checkIn : ''}${hcc.checkIn && hcc.checkOut ? ' · ' : ''}${hcc.checkOut ? '<strong>Check-out:</strong> ' + hcc.checkOut : ''}</div>` : ''}
+        ${hcc.observacao ? `<div class="row" style="color:#777">ℹ️ ${hcc.observacao}</div>` : ''}
+      </div>
+    </div>` : '';
+
+  // Resumo do destino
+  const dr = cartilhaExtras?.destinoResumo;
+  const drHasContent = dr && (dr.clima || dr.moeda || dr.tomada || dr.fuso || dr.idioma || dr.agua || dr.dicas);
+  const drHTML = drHasContent ? `
+    <div class="cartilha-section">
+      <div class="cartilha-label">Resumo do destino${dr.destino ? ' — ' + dr.destino : ''}</div>
+      <div class="cartilha-destino-grid">
+        ${dr.clima  ? `<div class="cartilha-destino-item"><strong>🌤 Clima</strong>${dr.clima}</div>`   : ''}
+        ${dr.moeda  ? `<div class="cartilha-destino-item"><strong>💱 Moeda</strong>${dr.moeda}</div>`   : ''}
+        ${dr.tomada ? `<div class="cartilha-destino-item"><strong>🔌 Tomada</strong>${dr.tomada}</div>` : ''}
+        ${dr.fuso   ? `<div class="cartilha-destino-item"><strong>🕐 Fuso</strong>${dr.fuso}</div>`     : ''}
+        ${dr.idioma ? `<div class="cartilha-destino-item"><strong>🗣 Idioma</strong>${dr.idioma}</div>` : ''}
+        ${dr.agua   ? `<div class="cartilha-destino-item"><strong>💧 Água</strong>${dr.agua}</div>`    : ''}
+        ${dr.dicas  ? `<div class="cartilha-destino-dicas">💡 ${dr.dicas}</div>` : ''}
+      </div>
+    </div>` : '';
+
+  // Emergências
+  const emerg = cartilhaExtras?.emergencias || [];
+  const emergHTML = emerg.length ? `
+    <div class="cartilha-section">
+      <div class="cartilha-label">Contatos de emergência</div>
+      <div class="cartilha-emerg-grid">
+        ${emerg.map(e => `
+          <div class="cartilha-emerg-item">
+            <div class="cartilha-emerg-tipo">${e.tipo || ''}</div>
+            ${e.telefone ? `<div class="cartilha-emerg-tel">${e.telefone}</div>` : ''}
+            ${e.endereco ? `<div class="cartilha-emerg-obs">${e.endereco}</div>` : ''}
+            ${e.observacao ? `<div class="cartilha-emerg-obs">${e.observacao}</div>` : ''}
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
   // Orientações
   const orientacoes = getOrientacoes();
   const orientHTML = orientacoes.length ? `
@@ -1877,6 +1992,9 @@ function renderCartilha() {
       </div>
       ${voosHTML}
       ${hospHTML}
+      ${hccHTML}
+      ${drHTML}
+      ${emergHTML}
       ${orientHTML}
       <div class="cartilha-encerra">
         <h2>✈ Boa viagem!</h2>
