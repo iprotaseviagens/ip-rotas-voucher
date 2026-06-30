@@ -1178,7 +1178,7 @@ Regras:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        max_tokens: 8000,
         messages: [{ role: 'user', content: msgContent }]
       })
     });
@@ -1189,6 +1189,9 @@ Regras:
     }
 
     const data = await resp.json();
+    if (data.stop_reason === 'max_tokens') {
+      throw new Error('Resposta truncada (voucher muito longo). Tente enviar menos arquivos por vez ou cole só as partes essenciais.');
+    }
     const raw  = data.content.map(b => b.text || '').join('').trim();
     if (!raw) throw new Error('Resposta vazia.');
 
