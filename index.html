@@ -1158,15 +1158,70 @@ Regras:
 - "servicosInclusos" = array de strings descrevendo cada servico incluso
 - "locCia" = localizador da companhia aerea
 - "infoTopicos" = topicos relevantes para o voucher tecnico
-- "orientacoes" = array de objetos {"titulo":"emoji + titulo","texto":"corpo"} para a cartilha.
-  Analise o perfil dos passageiros e inclua APENAS orientacoes relevantes:
-  SEMPRE: chegada ao aeroporto (calcule 2h30 antes da partida), documentacao obrigatoria, bagagem de mao.
-  SE crianca < 2 anos: embarque prioritario, bebe conforto como bagagem especial.
-  SE crianca 2-17 anos: certidao de nascimento obrigatoria, autorizacao notarial se so um responsavel.
-  SE voo internacional: documentacao internacional e visto.
-  SE hotel: dica de chegada baseada no horario de pouso vs check-in.
-  SE seguro: como acionar.
-  Tom amigavel e direto. Titulo com emoji, texto 2-3 linhas.`;
+- "orientacoes" = array de objetos {"titulo":"emoji + titulo","texto":"corpo"} para a cartilha de boas-vindas.
+  Faca uma CURADORIA RICA E COMPLETA. Gere de 12 a 20 orientacoes contextuais, cobrindo TUDO que for relevante
+  ao perfil dos passageiros, ao destino, e a cada servico contratado. Nao seja avarento — e melhor sobrar
+  do que faltar. Cada orientacao deve ser pratica, acionavel e especifica para esta viagem (use nomes de
+  cidades, horarios reais, companhia aerea, hotel, etc. extraidos do voucher).
+
+  SEMPRE incluir (adaptando ao contexto):
+    * "⏰ Chegada ao aeroporto" — calcule horario real: 2h antes p/ domestico, 3h p/ internacional, a partir da partida do 1o voo.
+    * "📄 Documentacao obrigatoria" — liste o documento valido (RG/CNH p/ domestico; passaporte c/ 6 meses de validade p/ internacional).
+    * "📱 Check-in online" — abre 48h ou 24h antes (varia por cia: GOL/LATAM 48h, Azul 60h). Cite a cia real.
+    * "🎒 Bagagem de mao essencial" — documentos, remedios de uso continuo, carregador, itens de valor, cartao do seguro, troca de roupa minima.
+    * "🧳 Franquia de bagagem" — quantidade e peso conforme a tarifa contratada (cite valores reais se constarem no voucher).
+    * "🚫 Itens proibidos / restricoes liquidas" — liquidos >100ml no internacional, objetos cortantes, baterias avulsas.
+    * "📞 Suporte 24h IP Rotas" — telefone (31) 9 7216-5602 e canal preferencial em caso de imprevisto.
+
+  SE houver criancas:
+    * < 2 anos (colo): embarque prioritario, bebe conforto vai como bagagem especial, leve formula/agua/troca extra.
+    * 2-11 anos: certidao de nascimento original obrigatoria; em viagem domestica sem um dos pais, autorizacao judicial OU autorizacao do ausente com firma reconhecida.
+    * 12-17 anos desacompanhados ou com um responsavel: regras especificas + autorizacao notarial.
+
+  SE voo internacional:
+    * Passaporte (validade minima 6 meses apos retorno).
+    * Visto / autorizacao eletronica (eTA, ESTA, ETIAS, e-Visa) — cite o exigido pelo pais.
+    * Vacinas (febre amarela em destinos exigentes; cartao internacional).
+    * Declaracao eletronica de bens e valores (e-DBV) se levar > US$ 10 mil.
+    * Moeda local + dica de cambio (dinheiro vs cartao + IOF).
+    * Adaptador de tomada (padrao do pais) e voltagem.
+    * Chip internacional / eSIM / roaming.
+    * Fuso horario (diferenca em horas para o Brasil).
+    * Idioma e frases basicas se nao for portugues/espanhol.
+
+  SE conexao aerea: tempo minimo de conexao, se troca de aeroporto/terminal, se precisa retirar e despachar bagagem novamente (internacional com chegada no Brasil).
+
+  SE hospedagem:
+    * Check-in / check-out (horarios padrao + politica de early check-in / late check-out).
+    * Como chegar do aeroporto ao hotel (cite o transfer se contratado, ou alternativas: taxi/Uber/metro/transfer regular).
+    * O que o hotel oferece (cafe da manha incluso? all inclusive?). Cite a categoria da acomodacao.
+    * Taxa de turismo / city tax / resort fee (informar que e cobrado no balcao se for o caso do destino).
+    * No-show: orientar a confirmar chegada se atrasar.
+
+  SE transfer: ponto de encontro no aeroporto (placa com nome), telefone do receptivo local, prazo de espera.
+
+  SE passeios: horario de saida, ponto de encontro, roupa/calcado adequado, protetor solar, agua, levar dinheiro p/ extras.
+
+  SE cruzeiro: horario de embarque, documentos especificos, codigo de vestimenta a bordo, sistema de gorjetas, cartao de bordo, conexao internet.
+
+  SE aluguel de carro: CNH valida (PID se internacional), idade minima, cartao credito como caucao, regras de devolucao e combustivel.
+
+  SE seguro viagem: telefone de acionamento 24h, app da seguradora, como pedir reembolso, cobertura principal contratada.
+
+  SE destino especifico — adicione orientacoes do destino:
+    * Clima previsto no periodo (estacao, chuvas, temperatura media) e dica de roupa.
+    * Cultura local relevante (gorjetas, gestos, vestimenta em locais religiosos, lei seca, etc).
+    * Seguranca (regioes a evitar, golpes comuns).
+    * Transporte urbano principal (metro/onibus/Uber).
+    * Tomadas / agua potavel.
+    * Apps uteis (mapas offline, transporte, traducao).
+
+  SE idoso(s) ou mobilidade reduzida: solicitar assistencia especial no balcao com antecedencia, embarque prioritario.
+  SE gestante: declaracao medica conforme semana gestacional.
+  SE PET embarcado: kennel, atestado veterinario, regra da cia.
+
+  Tom: amigavel, direto, especifico. Titulo com emoji + frase curta. Texto: 2-4 linhas com a informacao pratica.
+  NUNCA gere orientacoes genericas que nao se aplicam a esta viagem.`;
 
 
     msgContent.push({ type: 'text', text: promptText });
