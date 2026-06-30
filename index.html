@@ -561,15 +561,15 @@
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
              ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
           <div class="upload-icon">📎</div>
-          <h4>Solte o arquivo aqui ou clique</h4>
-          <p>Voucher da CVC, Livelo, GOL, LATAM, Azul…</p>
+          <h4>Solte os arquivos aqui ou clique</h4>
+          <p>Voucher da CVC, Livelo, GOL, LATAM, Azul… (pode enviar vários)</p>
           <div class="upload-types">
             <span class="badge">PDF</span>
             <span class="badge">PNG</span>
             <span class="badge">JPG</span>
           </div>
         </div>
-        <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" onchange="handleFile(this)">
+        <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple style="display:none" onchange="handleFile(this)">
         <div id="fileName" style="font-size:11px;color:var(--muted);margin-top:4px;display:none"></div>
       </div>
 
@@ -813,9 +813,7 @@ const modulos = {
   cruzeiro: false, protocolo: true
 };
 
-let uploadedFile  = null;
-let uploadedB64   = null;
-let uploadedMime  = null;
+let uploadedFiles = []; // [{ name, mime, b64 }]
 
 // ── Init
 window.onload = () => {
@@ -1063,17 +1061,38 @@ function getServicos() {
 // ════════════════════════════════════════════════════════════
 function dragOver(e)  { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag-over'); }
 function dragLeave(e) { document.getElementById('uploadZone').classList.remove('drag-over'); }
-function dropFile(e)  { e.preventDefault(); dragLeave(e); processFile(e.dataTransfer.files[0]); }
-function handleFile(input) { if (input.files[0]) processFile(input.files[0]); }
+function dropFile(e)  { e.preventDefault(); dragLeave(e); processFiles(e.dataTransfer.files); }
+function handleFile(input) { processFiles(input.files); }
 
-function processFile(file) {
-  uploadedFile = file;
-  uploadedMime = file.type;
-  document.getElementById('fileName').style.display = 'block';
-  document.getElementById('fileName').textContent = '📎 ' + file.name;
-  const reader = new FileReader();
-  reader.onload = e => { uploadedB64 = e.target.result.split(',')[1]; };
-  reader.readAsDataURL(file);
+function processFiles(fileList) {
+  if (!fileList || !fileList.length) return;
+  Array.from(fileList).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedFiles.push({ name: file.name, mime: file.type, b64: e.target.result.split(',')[1] });
+      renderFileList();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderFileList() {
+  const el = document.getElementById('fileName');
+  if (!uploadedFiles.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = uploadedFiles.map((f, i) =>
+    `<div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+       <span>📎 ${f.name}</span>
+       <button type="button" onclick="removeFile(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0">✕</button>
+     </div>`
+  ).join('');
+}
+
+function removeFile(idx) {
+  uploadedFiles.splice(idx, 1);
+  renderFileList();
+  // permite re-selecionar o mesmo arquivo depois de remover
+  document.getElementById('fileInput').value = '';
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1083,7 +1102,7 @@ async function extrairDados() {
   // Chave gerenciada pelo servidor Vercel — não necessária no browser
 
   const texto = document.getElementById('pasteText').value.trim();
-  if (!texto && !uploadedB64) {
+  if (!texto && !uploadedFiles.length) {
     alert('Cole o texto do voucher ou envie um arquivo PDF/imagem.');
     return;
   }
@@ -1094,19 +1113,19 @@ async function extrairDados() {
   try {
     const msgContent = [];
 
-    if (uploadedB64 && uploadedMime) {
-      if (uploadedMime === 'application/pdf') {
-        msgContent.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: uploadedB64 } });
+    uploadedFiles.forEach(f => {
+      if (f.mime === 'application/pdf') {
+        msgContent.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: f.b64 } });
       } else {
-        msgContent.push({ type: 'image', source: { type: 'base64', media_type: uploadedMime, data: uploadedB64 } });
+        msgContent.push({ type: 'image', source: { type: 'base64', media_type: f.mime, data: f.b64 } });
       }
-    }
+    });
 
     const promptText = `Você é um assistente especializado em leitura de vouchers de viagem brasileiros (CVC, Livelo, GOL, LATAM, Azul, Decolar, operadoras).
 
 Analise o voucher e extraia TODOS os dados disponíveis, retornando APENAS um JSON válido, sem texto adicional, sem markdown, sem blocos de código.
 
-${texto ? 'TEXTO DO VOUCHER:\n' + texto : '(veja o arquivo em anexo)'}
+${texto ? 'TEXTO DO VOUCHER:\n' + texto : (uploadedFiles.length > 1 ? '(veja os ' + uploadedFiles.length + ' arquivos em anexo — combine os dados de todos)' : '(veja o arquivo em anexo)')}
 
 Formato JSON exato:
 {
@@ -1632,8 +1651,10 @@ function limparTudo() {
   document.getElementById('orientList').innerHTML   = ''; orientCount   = 0;
   document.getElementById('pasteText').value = '';
   document.getElementById('f-info').value    = '';
-  uploadedFile = null; uploadedB64 = null;
+  uploadedFiles = [];
   document.getElementById('fileName').style.display = 'none';
+  document.getElementById('fileName').innerHTML = '';
+  document.getElementById('fileInput').value = '';
   addPax(); addVoo(); addServico();
   // Tópicos padrão de informações adicionais
   addInfo('É obrigatória a apresentação dos documentos de identificação originais válidos de todos os passageiros no ato do embarque.');
